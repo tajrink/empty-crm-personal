@@ -2,16 +2,18 @@
  * Analytics routes
  */
 import { Router, type Request, type Response } from 'express'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import Groq from 'groq-sdk'
 
 const router = Router()
 
-// Initialize Supabase client
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+let supabase: SupabaseClient | null = null
+if (process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  supabase = createClient(
+    process.env.SUPABASE_URL,
+    process.env.SUPABASE_SERVICE_ROLE_KEY
+  )
+}
 
 // Initialize Groq client (optional)
 const groqApiKey = process.env.GROQ_API_KEY
@@ -21,23 +23,31 @@ const groq = groqApiKey ? new Groq({ apiKey: groqApiKey }) : null
 router.get('/daily-insights', async (req: Request, res: Response) => {
   try {
     // Get recent data from Supabase
-    const { data: clients } = await supabase
-      .from('clients')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
+    let clients: any[] = []
+    let tasks: any[] = []
+    let payments: any[] = []
+    if (supabase) {
+      const { data: c } = await supabase
+        .from('clients')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      clients = c || []
 
-    const { data: tasks } = await supabase
-      .from('tasks')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
+      const { data: t } = await supabase
+        .from('tasks')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      tasks = t || []
 
-    const { data: payments } = await supabase
-      .from('payments')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(10)
+      const { data: p } = await supabase
+        .from('payments')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(10)
+      payments = p || []
+    }
 
     // Prepare data for AI analysis
     const dataForAnalysis = {
