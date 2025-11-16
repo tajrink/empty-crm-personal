@@ -1,9 +1,0 @@
-{
-  "timestamp": "2025-10-31T20:47:18.931Z",
-  "database_url": "https://tbdgzudtkpkignccebvh.supabase.co",
-  "verification_status": "completed",
-  "tables_verified": [],
-  "crud_operations": "tested",
-  "relationships": "tested",
-  "rls_policies": "tested"
-}
