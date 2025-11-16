@@ -8,20 +8,9 @@
       "config": {
         "distDir": "dist"
       }
-    },
-    {
-      "src": "api/server.ts",
-      "use": "@vercel/node",
-      "config": {
-        "maxLambdaSize": "50mb"
-      }
     }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "api/index.ts"
-    },
     {
       "src": "/(.*)",
       "dest": "/dist/$1"
@@ -37,11 +26,6 @@
     "JWT_SECRET": "@jwt_secret",
     "CORS_ORIGIN": "@cors_origin",
     "PORT": "3001"
-  },
-  "functions": {
-    "api/index.ts": {
-      "maxDuration": 30
-    }
   },
   "buildCommand": "npm run vercel:build",
   "outputDirectory": "dist",
